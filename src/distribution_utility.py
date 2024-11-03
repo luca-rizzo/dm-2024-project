@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sbn
         
 def stats_and_distribution(races, column_name, attr_type):
-    show_stats(races, column_name)
+    show_stats(races, column_name, attr_type)
     if attr_type == 'numerical':
         show_hist_and_box_plot(races, column_name)
     elif attr_type == 'binary':
@@ -12,8 +12,8 @@ def stats_and_distribution(races, column_name, attr_type):
         show_bar_plot(races, column_name)
 
          
-def show_stats(races, column_name):
-    column = races[column_name]
+def show_stats(races, column_name, attr_type = 'numerical'):
+    column = races[column_name].astype('object') if attr_type == 'categorical' else races[column_name]
     print(f"Description of attribute '{column.name}':")
     display(column.describe())
     print("\nUnique values:")
@@ -51,8 +51,10 @@ def show_hist_and_box_plot(races, column_name):
     print(f"Outliers in {column.name}: {outliers_values}")
     
 def show_bar_plot(races, column_name):
+    values = races[column_name].dropna()
+    values_count = values.value_counts()
     plt.figure(figsize=(14, 10))
-    sbn.countplot(data=races, x=column_name)
+    sbn.barplot(x= values_count.index, y= values_count.values)
     plt.xlabel(column_name)
     plt.ylabel('Count')
     plt.xticks(rotation=90)
@@ -74,3 +76,11 @@ def binary_pie_chart(races, binary_feature):
     # Aggiungi il titolo
     plt.title(f'Piechart of {binary_feature}')
     plt.show()
+    
+def calculate_outlier_bounds(races, column_name):
+    Q1 = races[column_name].quantile(0.25)
+    Q3 = races[column_name].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return {"lower": lower_bound, "upper": upper_bound}
