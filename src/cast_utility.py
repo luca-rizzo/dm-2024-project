@@ -4,12 +4,14 @@ import numpy as np
 def cast_column_to_Int64(races, column_name):
     prev_column_type = races[column_name].dtype
     try:
+        #Check if the value before the cast is equal to the cast value
         res = np.all(races[column_name] == races[column_name].astype('Int64'))
         if res:
             races[column_name] = races[column_name].astype('Int64')
             print(f'Column casted from {prev_column_type} to {races[column_name].dtype}')
 
     except TypeError:
+        #If the casting is not possible a 'TypeError' exception will be raised
         print("Not castable!")
         
         
