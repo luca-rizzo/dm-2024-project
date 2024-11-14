@@ -87,4 +87,4 @@ def calculate_outlier_bounds(dataframe, column_name):
     IQR = Q3 - Q1
     lower_bound = Q1 - 1.5 * IQR
     upper_bound = Q3 + 1.5 * IQR
-    return {"OUTLIERS: lower bound": lower_bound, "upper bound": upper_bound}
+    return {"lower": lower_bound, "upper": upper_bound}
