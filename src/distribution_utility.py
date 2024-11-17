@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sbn
         
 def stats_and_distribution(races, column_name, attr_type):
@@ -88,3 +89,21 @@ def calculate_outlier_bounds(dataframe, column_name):
     lower_bound = Q1 - 1.5 * IQR
     upper_bound = Q3 + 1.5 * IQR
     return {"lower": lower_bound, "upper": upper_bound}
+
+def stats_on_missing_values(dataset):
+    nrec = dataset.shape[0]
+    results = {
+        'Feature': [],
+        'Null_counter': [],
+        'Perc_of_null_(%)': []
+    }
+
+    for col in dataset.columns:
+        nanCount = dataset[col].isna().sum()
+        perc = round((nanCount*100)/nrec,1)
+        results['Feature'].append(col)
+        results['Null_counter'].append(nanCount)
+        results['Perc_of_null_(%)'].append(perc)
+
+    df_results = pd.DataFrame(results)
+    display(df_results)
