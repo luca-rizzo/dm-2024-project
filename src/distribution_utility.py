@@ -107,3 +107,31 @@ def stats_on_missing_values(dataset):
 
     df_results = pd.DataFrame(results)
     display(df_results)
+
+def show_heatmap(dataset: pd.DataFrame, columns, correlation_method):
+    working_dataset = dataset[columns]
+    correlation_matrix = correlations(working_dataset)
+    only_selected_type = correlation_matrix[correlation_matrix['correlation_type'] == correlation_method]
+    g = sbn.FacetGrid(only_selected_type, col="correlation_type", col_wrap=1, height=9, aspect=5)
+    g.map_dataframe(lambda data, color: sbn.heatmap(
+        data[data.columns[:-1]], #Ignore the last column of the matrix which contains the correlation type
+        cmap="coolwarm", #Colormap 
+        annot=True, #Correlation values inside the cell
+        square=True, #Square shape for each cell of the matrix
+        cbar=True, #Color bar next to the matrix to "visually" interpret the correlation
+        linewidths=1,  #Lines between cells
+        annot_kws={"size": 8}  #Font size
+    ))
+    plt.show()
+    plt.close()
+
+def correlations(dataset: pd.DataFrame) -> pd.DataFrame:
+    correlations_dictionary = {
+        correlation_type: dataset.corr(numeric_only=True, method=correlation_type)
+        for correlation_type in ("kendall", "pearson", "spearman")
+    }
+    for i, k in enumerate(correlations_dictionary.keys()):
+        correlations_dictionary[k].loc[:, "correlation_type"] = k
+    correlations_matrix = pd.concat(correlations_dictionary.values())
+
+    return correlations_matrix
