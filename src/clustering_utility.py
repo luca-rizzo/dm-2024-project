@@ -13,7 +13,7 @@ def clusters_conditional_box_plot(df, cluster_label):
 
     for i, column in enumerate(columns):
         sbn.boxplot(x = cluster_label, y=column, data=df, ax=axes[i])
-        axes[i].set_title(f"Distribution of '{column}'")
+        axes[i].set_title(f"Distribution of '{column}'", fontweight='bold')
         axes[i].set_xlabel("Cluster")
         axes[i].set_ylabel(column)
 
