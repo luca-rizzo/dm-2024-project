@@ -86,8 +86,10 @@ def calculate_outlier_bounds(dataframe, column_name):
     Q1 = dataframe[column_name].quantile(0.25)
     Q3 = dataframe[column_name].quantile(0.75)
     IQR = Q3 - Q1
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
+    min_ = dataframe[column_name].min()
+    max_ = dataframe[column_name].max()
+    lower_bound = max(min_, Q1 - 1.5 * IQR)
+    upper_bound = min(max_, Q3 + 1.5 * IQR)
     return {"lower": lower_bound, "upper": upper_bound}
 
 def stats_on_missing_values(dataset):
@@ -135,3 +137,103 @@ def correlations(dataset: pd.DataFrame) -> pd.DataFrame:
     correlations_matrix = pd.concat(correlations_dictionary.values())
 
     return correlations_matrix
+
+
+
+def check_all_outliers(df, columns):
+
+    # dataframe to keep track of outliers for each row
+    outlier_flags = pd.DataFrame(index=df.index)
+
+    for column in columns:
+        bounds = calculate_outlier_bounds(df, column)
+        lower_bound = bounds['lower']
+        upper_bound = bounds['upper']
+        
+        # set rows with outliers for the current column
+        outlier_flags[column] = (df[column] < lower_bound) | (df[column] > upper_bound)
+
+    # count the number of column with outliers for each row
+    outlier_flags['outlier_count'] = outlier_flags.sum(axis=1)
+
+    # compute the percentage of columns with outliers for each row
+    outlier_flags['outlier_percentage'] = (outlier_flags['outlier_count'] / len(columns)) * 100
+
+    # rows with at least one outlier
+    rows_with_outliers = outlier_flags[outlier_flags['outlier_count'] > 0]
+
+    display(rows_with_outliers)
+
+    print(f"Total number of rows: {len(df)}")
+    print(f"Total rows with outliers: {len(rows_with_outliers)}")
+    print(f"Percentage of rows with outliers: {(len(rows_with_outliers) / len(df)) * 100:.2f}%")
+
+    return rows_with_outliers
+
+
+def compare_distributions(dataframe1, dataframe2, column_name):
+    column1 = dataframe1[column_name]
+    column2 = dataframe2[column_name]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+   
+    # Histogram1 
+    sbn.histplot(column1, bins='sturges', ax=axes[0])
+    axes[0].set_title(f'Histogram before outliers cleaning', fontweight='bold')
+    axes[0].set_xlabel(column1.name) 
+    axes[0].set_ylabel('Frequency')
+
+    #Histogram2
+    sbn.histplot(column2, bins='sturges', ax=axes[1])
+    axes[1].set_title(f'Histogram after outliers cleaning', fontweight='bold')
+    axes[1].set_xlabel(column2.name) 
+    axes[1].set_ylabel('Frequency')
+
+
+    plt.tight_layout() 
+    plt.show()
+
+
+def compare_distributions_consistent(dataframe1, dataframe2, column_name):
+    column1 = dataframe1[column_name]
+    column2 = dataframe2[column_name]
+    
+    # Combine the two datasets and calculate shared bin edges
+    combined_data = np.concatenate([column1, column2])
+    bins = np.histogram_bin_edges(combined_data, bins='sturges')  # Using the same binning method for consistency
+    
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Histogram 1
+    sbn.histplot(column1, bins=bins, ax=axes[0])
+    axes[0].set_title('Histogram before outliers cleaning', fontweight='bold')
+    axes[0].set_xlabel(column1.name)
+    axes[0].set_ylabel('Frequency')
+
+    # Histogram 2
+    sbn.histplot(column2, bins=bins, ax=axes[1])
+    axes[1].set_title('Histogram after outliers cleaning', fontweight='bold')
+    axes[1].set_xlabel(column2.name)
+    axes[1].set_ylabel('Frequency')
+
+    plt.tight_layout()
+    plt.show()
+
+def compare_box_plots(dataframe1, dataframe2, column_name):
+    column1 = dataframe1[column_name]
+    column2 = dataframe2[column_name]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Boxplot1
+    boxplot_dict = axes[0].boxplot(column1[~np.isnan(column1)])  # Removes the NaNs to avoid problems
+    axes[0].set_title(f'Boxplot before outliers cleaning', fontweight='bold')
+    axes[0].set_xlabel(column1.name)
+
+    # Boxplot2
+    boxplot_dict = axes[1].boxplot(column2[~np.isnan(column2)])  # Removes the NaNs to avoid problems
+    axes[1].set_title(f'Boxplot after outliers cleaning', fontweight='bold')
+    axes[1].set_xlabel(column2.name)
+
+
+    plt.tight_layout() 
+    plt.show()
