@@ -1,5 +1,12 @@
+# Function to analyze outliers by dividing the space above the upper bound and below the lower bound into discrete intervals, 
+# to explore the distribution and frequency of outliers within these ranges
+
+# input param: num_ranges_up -> number of intervals you want to analyze above the upper bound
+#              num_ranges_down -> number of intervals you want to analyze below the lower bound
+#              range_increment_up -> size of each above interval
+#              range_increment_down -> size of each below interval
 def analyze_outliers(dataframe, column, lower_bound, upper_bound, num_ranges_up, num_ranges_down, range_increment_up, range_increment_down):
-    # Identifica gli outliers
+    # get outliers
     outliers = dataframe[
         (dataframe[column] < lower_bound) | (dataframe[column] > upper_bound)
     ]
@@ -15,7 +22,7 @@ def analyze_outliers(dataframe, column, lower_bound, upper_bound, num_ranges_up,
     total_outliers = len(outliers_values)
     print(f"Total outliers: {total_outliers}")
 
-    # Intervalli sopra l'upper bound (se ci sono outliers sopra)
+    # Intervals above the upper bound (if there are any outliers above)
     if not outliers_above.empty:
         upper_ranges = [upper_bound + i * range_increment_up for i in range(num_ranges_up + 1)]
 
@@ -37,14 +44,14 @@ def analyze_outliers(dataframe, column, lower_bound, upper_bound, num_ranges_up,
         upper_ranges_outliers_counts = []
         outliers_above_last_range = 0
 
-    # Intervalli sotto il lower bound (se ci sono outliers sotto)
+    # Intervals below the lower bound (if there are any outliers below)
     if not outliers_below.empty:
         lower_ranges = [lower_bound - i * range_increment_down for i in range(num_ranges_down + 1)]
 
         lower_ranges_outliers_counts = []
         for i in range(len(lower_ranges) - 1):
-            range_min = lower_ranges[i + 1]  # Range più piccolo
-            range_max = lower_ranges[i]      # Range più grande
+            range_min = lower_ranges[i + 1]  # lower range
+            range_max = lower_ranges[i]      # greater range
             count = len(outliers_values[
                 (outliers_values < range_max) &
                 (outliers_values >= range_min)
