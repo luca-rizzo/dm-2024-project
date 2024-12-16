@@ -111,24 +111,27 @@ def data_for_non_distance_method():
 
 def data_for_distance_method():
     dataset = data_pre_processing()
+
+    print(dataset.columns)
     categorical_columns = ['geo area']
     dataset = categorical_columns_encoding(dataset, categorical_columns)
     
-    dataset.drop(['profile'], axis=1, inplace=True)
+    dataset.drop(['profile', 'geo area'], axis=1, inplace=True)
     
     scaler = StandardScaler()
     columns_to_be_scaled = ['cyclist_age', 'race_year', 'points', 'length', 'climb_total',
        'startlist_quality', 'BMI', 'AVG position_2021',
        '# cyclist races_2021', 'std_dev position_2021']
+        
     top20 = dataset.pop('top20')
-    geo_area = dataset.pop('geo area')
+    geo_area_num = dataset.pop('geo area_num')
     dataset = pd.DataFrame(scaler.fit_transform(dataset), columns=columns_to_be_scaled)
     dataset = pd.concat([dataset.reset_index(drop=True), top20.reset_index(drop=True)], axis=1)
-    dataset = pd.concat([dataset.reset_index(drop=True), geo_area.reset_index(drop=True)], axis=1)
-    dataset_for_distance = pd.get_dummies(dataset_for_distance, columns = ['geo area'], prefix_sep='_')
+    dataset = pd.concat([dataset.reset_index(drop=True), geo_area_num.reset_index(drop=True)], axis=1)
+
+    dataset_for_distance = pd.get_dummies(dataset, columns = ['geo area_num'], prefix = "geo area", prefix_sep='_')
     
-    dataset.drop(categorical_columns, axis=1, inplace=True) #column already encoded
-    return dataset
+    return dataset_for_distance
 
 def train_test_for_distance():
     dataset = data_for_distance_method()
