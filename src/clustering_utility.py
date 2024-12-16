@@ -29,37 +29,39 @@ def clusters_conditional_box_plot(df, cluster_label):
 
 # it requires a dataframe which is already standardized
 def compute_similarity_matrix(standardized_df, cluster_labels):
-    # Calcola la matrice di prossimità (distanze euclidee tra punti)
-    pairwise_distances_ = pairwise_distances(standardized_df, metric="cosine")
+    # Discard noisy points
+    valid_indices = np.where(cluster_labels != -1)[0]
+    filtered_df = standardized_df.iloc[valid_indices]  # Dataset filtering
+    filtered_labels = cluster_labels[valid_indices]   # Label filtering
 
-    # Etichette dei cluster
-    n = len(cluster_labels)
+    # Determine the pairwise distance matrix (using the Euclidean distance)
+    pairwise_distances_ = pairwise_distances(filtered_df, metric="euclidean")
 
+    # Cluster labels
+    n = len(filtered_labels)
 
-    # sorting by labels
-    sorted_pairwisedist = pairwise_distances_[np.argsort(cluster_labels)][:, np.argsort(cluster_labels)]
+    # Sorting by labels
+    sorted_pairwisedist = pairwise_distances_[np.argsort(filtered_labels)][:, np.argsort(filtered_labels)]
     labels = cluster_labels[np.argsort(cluster_labels)]
 
-    # keeping the distance values between 0 and 1.
+    # Keeping the distance values between 0 and 1.
     sorted_pairwisedist = sorted_pairwisedist / np.max(sorted_pairwisedist)
     sorted_similarity = 1- sorted_pairwisedist / np.max(sorted_pairwisedist)
 
-    # Inizializza la matrice di incidenza come matrice di zeri
-    incidence_matrix = np.zeros((n, n), dtype=int)
+    ideal_similarity_matrix = np.zeros((n, n), dtype=int) #fill all positions with zeros
 
     for i in range(n):
         for j in range(n):
-        # Verifica se i punti i e j appartengono allo stesso cluster
+        #matrix[i, j]==1 if point i and point j belong to the same cluster
             if labels[i] == labels[j]:
-                incidence_matrix[i, j] = 1
+                ideal_similarity_matrix[i, j] = 1
 
-   
+
     # pearsonr requires two array_like inputs. ravel returns a 1-D array of the inputs
     proximity_vector = sorted_similarity.ravel()
-    ideal_similarity_vector = incidence_matrix.ravel()
+    ideal_similarity_vector = ideal_similarity_matrix.ravel()
     correlation, _ = pearsonr(proximity_vector, ideal_similarity_vector)
     print(f"Pearson correlation between the proximity matrix and the ideal similarity matrix: {correlation:.4f}")
-
 
     plt.title("Sorted proximity matrix", fontweight='bold')
     plt.xlabel("Points ordered by cluster")
@@ -69,3 +71,6 @@ def compute_similarity_matrix(standardized_df, cluster_labels):
     plt.show()
     
     plt.close()
+
+
+    
