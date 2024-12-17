@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from imblearn.under_sampling import RandomUnderSampler
 
 RANDOM_STATE = 42
 
@@ -18,13 +19,24 @@ def data_pre_processing():
 
     dataset = drop_previous_and_merge_newstats(dataset, new_stats)
 
+    dataset = impute_null_stats_2021(dataset)
+
     dataset.drop(['delta', 'median_delta', 'std_delta'], axis=1, inplace=True)
     drop_redundant_columns(dataset)
 
     dataset['top20'] = (dataset['position'] < 20).astype(int)
     dataset.drop(['position'], axis=1, inplace=True)
-    
+
     return dataset
+
+
+def impute_null_stats_2021(dataset):
+    to_work = dataset.copy()
+    # Colonne su cui riempire i valori NaN
+    columns_to_fill = ['median position_2021', 'AVG position_2021', '# cyclist races_2021', 'std_dev position_2021']
+    for col in columns_to_fill:
+        to_work[col] = to_work[col].fillna(to_work[col].mean())
+    return to_work
 
 
 def drop_redundant_columns(dataset):
@@ -86,8 +98,8 @@ def categorical_columns_encoding(dataset, variables):
     for variable in variables:
         #get the unique variable's values
         var = sorted(dataset[variable].unique())
-        
-        #generate a mapping from the variable's values to the number representation  
+
+        #generate a mapping from the variable's values to the number representation
         mapping = dict(zip(var, range(0, len(var) + 1)))
 
         print(f"Mapping of {variable}:", mapping)
@@ -98,9 +110,9 @@ def categorical_columns_encoding(dataset, variables):
 def data_for_non_distance_method():
     dataset = data_pre_processing()
     categorical_columns = ['geo area']
-    
+
     dataset = categorical_columns_encoding(dataset, categorical_columns)
-    
+
     dataset.drop(categorical_columns, axis=1, inplace=True) #column already encoded
     return dataset
 
@@ -108,7 +120,7 @@ def data_for_distance_method():
     dataset = data_pre_processing()
     dataset_copy = dataset.copy()
     dataset.drop(['profile'], axis=1, inplace=True)
-    
+
     scaler = StandardScaler()
     columns_to_be_scaled = ['cyclist_age', 'race_year', 'points', 'length', 'climb_total',
            'startlist_quality', 'BMI', 'AVG position_2021',
@@ -119,7 +131,7 @@ def data_for_distance_method():
     dataset = pd.concat([dataset.reset_index(drop=True), top20.reset_index(drop=True)], axis=1)
     dataset = pd.concat([dataset.reset_index(drop=True), geo_area.reset_index(drop=True)], axis=1)
     dataset = pd.get_dummies(dataset, columns = ['geo area'], prefix_sep='_')
-    
+
     return dataset, dataset_copy
 
 def train_test_for_distance():
@@ -129,7 +141,7 @@ def train_test_for_distance():
     threshold_for_standardized = (2022-mean)/std
     test_set=dataset_std[dataset_std['race_year']>=threshold_for_standardized]
     train_set=dataset_std[dataset_std['race_year']<threshold_for_standardized]
-    train_label=train_set.pop('top20') 
+    train_label=train_set.pop('top20')
     test_label=test_set.pop('top20')
     return train_set, test_set, train_label, test_label
 
@@ -137,9 +149,26 @@ def train_test_for_non_distance():
     dataset = data_for_non_distance_method()
     test_set=dataset[dataset['race_year']>=2022]
     train_set=dataset[dataset['race_year']<2022]
-    train_label=train_set.pop('top20') 
+    train_label=train_set.pop('top20')
     test_label=test_set.pop('top20')
     return train_set, test_set, train_label, test_label
 
+
+def perform_best_under_sampling(train_set, train_label):
+    rand_undersampler = RandomUnderSampler(random_state=RANDOM_STATE, sampling_strategy=0.67)
+    train_set_us, train_label_us = rand_undersampler.fit_resample(train_set, train_label)
+    return train_set_us, train_label_us
+
 def split_in_train_and_validation(train_set, train_label):
     return train_test_split(train_set, train_label, stratify = train_label, test_size=0.30, random_state=RANDOM_STATE)
+
+
+def get_label_percentages(labels, target_names):
+    label_counts = pd.Series(labels).value_counts()
+
+    label_percentages = (label_counts / len(labels)) * 100
+
+    return pd.DataFrame({
+        'Label': target_names,
+        'Percentage': label_percentages.values
+    }).sort_values(by='Percentage', ascending=False)
