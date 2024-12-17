@@ -1,0 +1,55 @@
+*** Grid search for a Decision Tree defined on the SMOTE oversampled dataset. Scoring='f1_macro' ***
+Best configuration: 0.822888 using {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 26}
+Mean and std of this setting: 0.754506 - 0.004778
+
+All configurations sorted by score:
+Mean: 0.822888, Std: 0.002600 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 26}
+Mean: 0.817721, Std: 0.003271 with: {'criterion': 'entropy', 'max_depth': 30, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 28}
+Mean: 0.817532, Std: 0.003186 with: {'criterion': 'gini', 'max_depth': 30, 'max_features': 'log2', 'min_samples_leaf': 2, 'min_samples_split': 22}
+Mean: 0.806504, Std: 0.003367 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'log2', 'min_samples_leaf': 8, 'min_samples_split': 28}
+Mean: 0.805658, Std: 0.002545 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 9, 'min_samples_split': 40}
+Mean: 0.801052, Std: 0.003710 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'log2', 'min_samples_leaf': 14, 'min_samples_split': 24}
+Mean: 0.795967, Std: 0.003754 with: {'criterion': 'gini', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 17, 'min_samples_split': 9}
+Mean: 0.794440, Std: 0.003710 with: {'criterion': 'gini', 'max_depth': 30, 'max_features': 'sqrt', 'min_samples_leaf': 18, 'min_samples_split': 27}
+Mean: 0.791584, Std: 0.004331 with: {'criterion': 'gini', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 22, 'min_samples_split': 29}
+Mean: 0.790176, Std: 0.004040 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'log2', 'min_samples_leaf': 24, 'min_samples_split': 38}
+Mean: 0.787349, Std: 0.005201 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 26, 'min_samples_split': 43}
+Mean: 0.783769, Std: 0.003860 with: {'criterion': 'gini', 'max_depth': 50, 'max_features': 'sqrt', 'min_samples_leaf': 32, 'min_samples_split': 33}
+Mean: 0.782494, Std: 0.003826 with: {'criterion': 'entropy', 'max_depth': 30, 'max_features': 'sqrt', 'min_samples_leaf': 33, 'min_samples_split': 43}
+Mean: 0.781539, Std: 0.003807 with: {'criterion': 'gini', 'max_depth': 20, 'max_features': 'log2', 'min_samples_leaf': 20, 'min_samples_split': 29}
+Mean: 0.778106, Std: 0.004393 with: {'criterion': 'entropy', 'max_depth': 50, 'max_features': 'log2', 'min_samples_leaf': 39, 'min_samples_split': 28}
+Mean: 0.775735, Std: 0.004095 with: {'criterion': 'gini', 'max_depth': 20, 'max_features': 'sqrt', 'min_samples_leaf': 32, 'min_samples_split': 40}
+Mean: 0.773006, Std: 0.002906 with: {'criterion': 'gini', 'max_depth': 50, 'max_features': 'log2', 'min_samples_leaf': 47, 'min_samples_split': 45}
+Mean: 0.772440, Std: 0.003656 with: {'criterion': 'gini', 'max_depth': 20, 'max_features': 'sqrt', 'min_samples_leaf': 39, 'min_samples_split': 20}
+Mean: 0.772409, Std: 0.003681 with: {'criterion': 'gini', 'max_depth': 20, 'max_features': 'sqrt', 'min_samples_leaf': 39, 'min_samples_split': 46}
+Mean: 0.769407, Std: 0.003179 with: {'criterion': 'gini', 'max_depth': 20, 'max_features': 'log2', 'min_samples_leaf': 47, 'min_samples_split': 25}
+Mean: 0.758733, Std: 0.005981 with: {'criterion': 'gini', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 20, 'min_samples_split': 31}
+Mean: 0.758555, Std: 0.004905 with: {'criterion': 'gini', 'max_depth': 15, 'max_features': 'sqrt', 'min_samples_leaf': 14, 'min_samples_split': 10}
+Mean: 0.756507, Std: 0.006382 with: {'criterion': 'gini', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 6, 'min_samples_split': 43}
+Mean: 0.755255, Std: 0.003750 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 22, 'min_samples_split': 28}
+Mean: 0.754506, Std: 0.004778 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'sqrt', 'min_samples_leaf': 15, 'min_samples_split': 44}
+Mean: 0.753410, Std: 0.003908 with: {'criterion': 'gini', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 39, 'min_samples_split': 3}
+Mean: 0.753324, Std: 0.006880 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 3, 'min_samples_split': 38}
+Mean: 0.752492, Std: 0.005415 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 22, 'min_samples_split': 45}
+Mean: 0.752478, Std: 0.005671 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'sqrt', 'min_samples_leaf': 32, 'min_samples_split': 5}
+Mean: 0.750869, Std: 0.005043 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'sqrt', 'min_samples_leaf': 44, 'min_samples_split': 9}
+Mean: 0.749744, Std: 0.006906 with: {'criterion': 'entropy', 'max_depth': 15, 'max_features': 'log2', 'min_samples_leaf': 33, 'min_samples_split': 49}
+Mean: 0.720461, Std: 0.008599 with: {'criterion': 'gini', 'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 5, 'min_samples_split': 27}
+Mean: 0.719073, Std: 0.006317 with: {'criterion': 'gini', 'max_depth': 10, 'max_features': 'log2', 'min_samples_leaf': 28, 'min_samples_split': 26}
+Mean: 0.718618, Std: 0.008612 with: {'criterion': 'entropy', 'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 24, 'min_samples_split': 37}
+Mean: 0.716352, Std: 0.009273 with: {'criterion': 'gini', 'max_depth': 10, 'max_features': 'log2', 'min_samples_leaf': 2, 'min_samples_split': 25}
+Mean: 0.715872, Std: 0.008664 with: {'criterion': 'entropy', 'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 5, 'min_samples_split': 43}
+Mean: 0.711415, Std: 0.011413 with: {'criterion': 'entropy', 'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 36, 'min_samples_split': 14}
+Mean: 0.707274, Std: 0.017094 with: {'criterion': 'entropy', 'max_depth': 10, 'max_features': 'log2', 'min_samples_leaf': 17, 'min_samples_split': 37}
+Mean: 0.678730, Std: 0.020097 with: {'criterion': 'gini', 'max_depth': 7, 'max_features': 'log2', 'min_samples_leaf': 36, 'min_samples_split': 15}
+Mean: 0.677971, Std: 0.015434 with: {'criterion': 'entropy', 'max_depth': 7, 'max_features': 'sqrt', 'min_samples_leaf': 28, 'min_samples_split': 8}
+Mean: 0.677583, Std: 0.022408 with: {'criterion': 'gini', 'max_depth': 7, 'max_features': 'sqrt', 'min_samples_leaf': 6, 'min_samples_split': 29}
+Mean: 0.663559, Std: 0.027405 with: {'criterion': 'entropy', 'max_depth': 5, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 45}
+Mean: 0.661094, Std: 0.023218 with: {'criterion': 'gini', 'max_depth': 5, 'max_features': 'log2', 'min_samples_leaf': 45, 'min_samples_split': 42}
+Mean: 0.656577, Std: 0.021454 with: {'criterion': 'entropy', 'max_depth': 5, 'max_features': 'sqrt', 'min_samples_leaf': 49, 'min_samples_split': 18}
+Mean: 0.654063, Std: 0.022893 with: {'criterion': 'entropy', 'max_depth': 5, 'max_features': 'sqrt', 'min_samples_leaf': 37, 'min_samples_split': 48}
+Mean: 0.653002, Std: 0.039170 with: {'criterion': 'gini', 'max_depth': 5, 'max_features': 'log2', 'min_samples_leaf': 13, 'min_samples_split': 42}
+Mean: 0.652029, Std: 0.034746 with: {'criterion': 'entropy', 'max_depth': 5, 'max_features': 'sqrt', 'min_samples_leaf': 42, 'min_samples_split': 29}
+Mean: 0.645318, Std: 0.024342 with: {'criterion': 'gini', 'max_depth': 5, 'max_features': 'log2', 'min_samples_leaf': 40, 'min_samples_split': 22}
+Mean: 0.638695, Std: 0.048291 with: {'criterion': 'gini', 'max_depth': 5, 'max_features': 'log2', 'min_samples_leaf': 49, 'min_samples_split': 50}
+Mean: 0.636668, Std: 0.044802 with: {'criterion': 'entropy', 'max_depth': 5, 'max_features': 'log2', 'min_samples_leaf': 2, 'min_samples_split': 29}
