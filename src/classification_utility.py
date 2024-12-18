@@ -199,13 +199,13 @@ def compare_roc_curves(curves, title="ROC Curves"):
     plt.figure(0).clf()
     for curve in curves:
         if isinstance(curve[0], tuple): 
-            fpr, tpr, auc, label = curve[0][0], curve[0][1], curve[0][2], curve[1]
+            fpr, tpr, auc_plot, label = curve[0][0], curve[0][1], curve[0][2], curve[1]
         else:
-            fpr, tpr, auc, label = curve
-        if auc == best_auc:
-            plt.plot(fpr, tpr, label=f"{label}, auc={auc:.4f}", linewidth=2.5, color='red')  # Highlight the "best" one
+            fpr, tpr, auc_plot, label = curve
+        if auc_plot == best_auc:
+            plt.plot(fpr, tpr, label=f"{label}, auc={auc_plot:.4f}", linewidth=2.5, color='red')  # Highlight the "best" one
         else:
-            plt.plot(fpr, tpr, label=f"{label}, auc={auc:.4f}")
+            plt.plot(fpr, tpr, label=f"{label}, auc={auc_plot:.4f}")
 
     # Add plot labels and title
     plt.xlabel('False Positive Rate')
