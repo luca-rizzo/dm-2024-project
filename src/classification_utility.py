@@ -216,6 +216,33 @@ def compare_roc_curves(curves, title="ROC Curves"):
     plt.close()
     return
 
+def compare_pr_curves(curves, title="Precision-Recall Curves"):
+    # Determine the curve with the maximum AUC for Precision-Recall curve (index 5 for auc_pr)
+    best_curve = max(curves, key=lambda x: x[0][5])  # x[0][5] is the AUC for PR (precision-recall)
+    
+    # Extract values from the best curve
+    best_precision, best_recall, best_auc_pr, best_label = best_curve[0][3], best_curve[0][4], best_curve[0][5], best_curve[1]
+    plt.figure(0).clf()
+    
+    for curve in curves:
+        precision, recall, auc_pr, label = curve[0][3], curve[0][4], curve[0][5], curve[1]
+        
+        if auc_pr == best_auc_pr:
+            # Highlight the best curve
+            plt.plot(recall, precision, label=f"{label}, AUC-PR={auc_pr:.4f}", linewidth=2.5, color='red')  
+        else:
+
+            plt.plot(recall, precision, label=f"{label}, AUC-PR={auc_pr:.4f}") 
+
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(title, fontweight='bold')
+    plt.legend(loc=0)
+    plt.show()
+    plt.close()
+    return
+
+
 def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
     # Check if the model supports predict_proba
     if not hasattr(classifier, "predict_proba"):
@@ -261,4 +288,4 @@ def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
     plt.close()
 
     # Returns the information required for the final plotting of the ROC curves of all the classifiers
-    return fpr, tpr, roc_auc, auc_pr
+    return fpr, tpr, roc_auc, precision, recall, auc_pr
