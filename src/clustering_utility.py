@@ -28,14 +28,13 @@ def clusters_conditional_box_plot(df, cluster_label):
 
 
 # it requires a dataframe which is already standardized
-def compute_similarity_matrix(standardized_df, cluster_labels):
+def compute_similarity_matrix(standardized_df, cluster_labels, m="euclidean"):
     # Discard noisy points
     valid_indices = np.where(cluster_labels != -1)[0]
     filtered_df = standardized_df.iloc[valid_indices]  # Dataset filtering
     filtered_labels = cluster_labels[valid_indices]   # Label filtering
-
     # Determine the pairwise distance matrix (using the Euclidean distance)
-    pairwise_distances_ = pairwise_distances(filtered_df, metric="euclidean")
+    pairwise_distances_ = pairwise_distances(filtered_df, metric=m)
 
     # Cluster labels
     n = len(filtered_labels)
