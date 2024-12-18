@@ -2,6 +2,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import RandomUnderSampler
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_curve, auc
+from sklearn.metrics import roc_curve
 
 RANDOM_STATE = 42
 
@@ -172,3 +177,88 @@ def get_label_percentages(labels, target_names):
         'Label': target_names,
         'Percentage': label_percentages.values
     }).sort_values(by='Percentage', ascending=False)
+
+def plot_confusion_matrix(classifier, prior_labels, predicted_labels):
+    cm = confusion_matrix(prior_labels, predicted_labels)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=classifier.classes_)
+    disp.plot()
+    plt.title("Confusion Matrix", fontweight='bold')
+    plt.show()
+    plt.close()
+    return
+
+def compare_roc_curves(curves, title="ROC Curves"):
+    # Determine the curve with the maximum AUC
+    best_curve = max(curves, key=lambda x: x[0][2] if isinstance(x[0], tuple) else x[2])  
+    if isinstance(best_curve[0], tuple):  # Unpack if necessary
+        best_fpr, best_tpr, best_auc, best_label = best_curve[0][0], best_curve[0][1], best_curve[0][2], best_curve[1]
+    else:
+        best_fpr, best_tpr, best_auc, best_label = best_curve[0], best_curve[1], best_curve[2], best_curve[3]
+
+    # Plot all curves, highlighting the best one
+    plt.figure(0).clf()
+    for curve in curves:
+        if isinstance(curve[0], tuple): 
+            fpr, tpr, auc, label = curve[0][0], curve[0][1], curve[0][2], curve[1]
+        else:
+            fpr, tpr, auc, label = curve
+        if auc == best_auc:
+            plt.plot(fpr, tpr, label=f"{label}, auc={auc:.4f}", linewidth=2.5, color='red')  # Highlight the "best" one
+        else:
+            plt.plot(fpr, tpr, label=f"{label}, auc={auc:.4f}")
+
+    # Add plot labels and title
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title, fontweight='bold')
+    plt.legend(loc=0)
+    plt.show()
+    plt.close()
+    return
+
+def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
+    # Check if the model supports predict_proba
+    if not hasattr(classifier, "predict_proba"):
+        print("This model does not support predict_proba().")
+        return None
+
+    # Get the probabilities of the positive classes
+    y_prob = classifier.predict_proba(input_data)[:, 1]
+    
+    precision, recall, _ = precision_recall_curve(predicted_labels, y_prob)
+    auc_pr = auc(recall, precision)  # AUC of the precision-recall curve
+    print(f"AUC-PR of the classifier: {auc_pr:.4f}")
+
+    fpr, tpr, _ = roc_curve(predicted_labels, y_prob)
+    roc_auc = auc(fpr, tpr)  # AUC of the ROC curve
+    print(f"AUC-ROC of the classifier: {roc_auc:.4f}")
+
+    # Set up the figure with two subplots (side by side)
+    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Precision-Recall Curve
+    ax[0].plot(recall, precision, color='b', linewidth=2, label=f'AUC-PR = {auc_pr:.4f}')
+    ax[0].set_xlabel('Recall')
+    ax[0].set_ylabel('Precision')
+    ax[0].set_title("Precision-Recall Curve", fontweight='bold')
+    ax[0].legend(loc="best")
+    ax[0].grid(alpha=0.3)
+
+    # ROC Curve
+    ax[1].plot(fpr, tpr, color='b', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
+    # Diagonal line that represents the random classifier
+    ax[1].plot([0, 1], [0, 1], color='gray', linestyle='--')
+    ax[1].set_xlim([0.0, 1.0])
+    ax[1].set_ylim([0.0, 1.05])
+    ax[1].set_xlabel('False Positive Rate')
+    ax[1].set_ylabel('True Positive Rate')
+    ax[1].set_title('ROC Curve', fontweight='bold')
+    ax[1].legend(loc='best')
+    ax[1].grid(alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+    plt.close()
+
+    # Returns the information required for the final plotting of the ROC curves of all the classifiers
+    return fpr, tpr, roc_auc, auc_pr
