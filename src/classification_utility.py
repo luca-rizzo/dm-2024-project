@@ -7,6 +7,8 @@ from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_recall_curve, auc
 from sklearn.metrics import roc_curve
+import seaborn as sbn
+import numpy as np
 
 RANDOM_STATE = 42
 
@@ -279,3 +281,16 @@ def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
 
     # Returns the information required for the final plotting of the ROC curves of all the classifiers
     return fpr, tpr, roc_auc, precision, recall, auc_pr
+
+def plot_distribution_and_normal(column, name):
+    plt.figure(figsize=(6, 4))
+    sbn.histplot(column, kde=True, stat="density", bins=30, label="Histogram")
+    #'density' normalizes the graph area to compare it with a normal distrib.
+    mean = column.mean()
+    std = column.std()
+    x = np.linspace(mean - 4 * std, mean + 4 * std, 100)
+    plt.plot(x, (1 / (std * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mean) / std) ** 2), 
+             color="red", label="Normal Distribution")
+    plt.title(f"Histogram of {name} overlaid with normal distribution")
+    plt.legend(loc='best')
+    plt.show()
