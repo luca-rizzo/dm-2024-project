@@ -188,26 +188,20 @@ def plot_confusion_matrix(classifier, prior_labels, predicted_labels):
     return
 
 def compare_roc_curves(curves, title="ROC Curves"):
-    # Determine the curve with the maximum AUC
-    best_curve = max(curves, key=lambda x: x[0][2] if isinstance(x[0], tuple) else x[2])  
-    if isinstance(best_curve[0], tuple):  # Unpack if necessary
-        best_fpr, best_tpr, best_auc, best_label = best_curve[0][0], best_curve[0][1], best_curve[0][2], best_curve[1]
-    else:
-        best_fpr, best_tpr, best_auc, best_label = best_curve[0], best_curve[1], best_curve[2], best_curve[3]
-
+    # Determine the curve with the maximum AUC for the ROC curve
+    # manages tuples in the form ((fpr, tpr, auc_roc, pr, rec, auc_pr), label)
+    best_curve = max(curves, key=lambda x: x[0][2]) 
+    best_auc = best_curve[0][2] # x[0][5] is the AUC for the ROC
+   
     # Plot all curves, highlighting the best one
     plt.figure(0).clf()
     for curve in curves:
-        if isinstance(curve[0], tuple): 
-            fpr, tpr, auc_plot, label = curve[0][0], curve[0][1], curve[0][2], curve[1]
-        else:
-            fpr, tpr, auc_plot, label = curve
+        fpr, tpr, auc_plot, label = curve[0][0], curve[0][1], curve[0][2], curve[1]
         if auc_plot == best_auc:
-            plt.plot(fpr, tpr, label=f"{label}, auc={auc_plot:.4f}", linewidth=2.5, color='red')  # Highlight the "best" one
+            plt.plot(fpr, tpr, label=f"{label}, roc_auc={auc_plot:.4f}", linewidth=2.5, color='red')  # Highlight the "best" one
         else:
-            plt.plot(fpr, tpr, label=f"{label}, auc={auc_plot:.4f}")
+            plt.plot(fpr, tpr, label=f"{label}, roc_auc={auc_plot:.4f}")
 
-    # Add plot labels and title
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title(title, fontweight='bold')
@@ -218,21 +212,18 @@ def compare_roc_curves(curves, title="ROC Curves"):
 
 def compare_pr_curves(curves, title="Precision-Recall Curves"):
     # Determine the curve with the maximum AUC for Precision-Recall curve (index 5 for auc_pr)
+    # manages tuples in the form ((fpr, tpr, auc_roc, pr, rec, auc_pr), label)
     best_curve = max(curves, key=lambda x: x[0][5])  # x[0][5] is the AUC for PR (precision-recall)
+    best_auc_pr = best_curve[0][5]
     
-    # Extract values from the best curve
-    best_precision, best_recall, best_auc_pr, best_label = best_curve[0][3], best_curve[0][4], best_curve[0][5], best_curve[1]
-    plt.figure(0).clf()
-    
+    # Plot all curves, highlighting the best one
+    plt.figure(0).clf() 
     for curve in curves:
         precision, recall, auc_pr, label = curve[0][3], curve[0][4], curve[0][5], curve[1]
-        
         if auc_pr == best_auc_pr:
-            # Highlight the best curve
-            plt.plot(recall, precision, label=f"{label}, AUC-PR={auc_pr:.4f}", linewidth=2.5, color='red')  
+            plt.plot(recall, precision, label=f"{label}, PR_auc={auc_pr:.4f}", linewidth=2.5, color='red') # Highlight the best curve
         else:
-
-            plt.plot(recall, precision, label=f"{label}, AUC-PR={auc_pr:.4f}") 
+            plt.plot(recall, precision, label=f"{label}, PR_auc={auc_pr:.4f}") 
 
     plt.xlabel('Recall')
     plt.ylabel('Precision')
@@ -241,7 +232,6 @@ def compare_pr_curves(curves, title="Precision-Recall Curves"):
     plt.show()
     plt.close()
     return
-
 
 def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
     # Check if the model supports predict_proba
