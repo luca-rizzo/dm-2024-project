@@ -1,4 +1,5 @@
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import RandomUnderSampler
@@ -166,11 +167,16 @@ def perform_best_under_sampling(train_set, train_label):
     train_set_us, train_label_us = rand_undersampler.fit_resample(train_set, train_label)
     return train_set_us, train_label_us
 
+def perform_smote_over_sampling(train_set, train_label):
+    smote_oversampler = SMOTE(k_neighbors=5, sampling_strategy=0.67, random_state=RANDOM_STATE)
+    train_set_smote, train_labels_smote = smote_oversampler.fit_resample(train_set, train_label)
+    return train_set_smote, train_labels_smote
+
 def split_in_train_and_validation(train_set, train_label):
     return train_test_split(train_set, train_label, stratify = train_label, test_size=0.30, random_state=RANDOM_STATE)
 
 
-def get_label_percentages(labels, target_names):
+def get_label_percentages(labels, target_names = ['not top20', 'top_20']):
     label_counts = pd.Series(labels).value_counts()
 
     label_percentages = (label_counts / len(labels)) * 100
@@ -294,3 +300,7 @@ def plot_distribution_and_normal(column, name):
     plt.title(f"Histogram of {name} overlaid with normal distribution")
     plt.legend(loc='best')
     plt.show()
+
+def build_model_with_params(model, params):
+    model.set_params(**params)
+    return model
