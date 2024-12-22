@@ -11,6 +11,7 @@ from sklearn.metrics import roc_curve
 import seaborn as sbn
 import numpy as np
 import tensorflow as tf
+from sklearn.metrics import f1_score
 
 RANDOM_STATE = 42
 
@@ -316,3 +317,32 @@ def plot_confusion_matrix_NN(prior_labels, predicted_labels, class_names):
     plt.title("Confusion Matrix", fontweight='bold')
     plt.show()
     return
+
+
+# input:
+#     models -> list of model objects
+#     predictions -> list of predicted labels
+#     true_labels -> the true labels extracted from the test (or validation) set
+# output:
+#     returns the best model object based on this metric
+#
+# The comparison is based on the F1-Score Macro AVG metric
+# The code also displays the comparison results
+def compare_f1_score(models:list, predictions:list, true_labels):
+    macro_f1_scores = []
+   
+    for y_pred in predictions:
+        score = f1_score(true_labels, y_pred, average='macro')
+        macro_f1_scores.append(score)
+        
+
+    model_names = [model.name if hasattr(model, 'name') else f"Model {i+1}" for i, model in enumerate(models)]
+
+    results = pd.DataFrame({'Model': model_names, 'Macro F1-Score': macro_f1_scores, 'Model Object': models})
+
+   
+    results = results.sort_values(by='Macro F1-Score', ascending=False)
+    display(results[['Model', 'Macro F1-Score']])
+   
+    best_model = results.iloc[0]['Model Object']  
+    return best_model
