@@ -10,6 +10,7 @@ from sklearn.metrics import precision_recall_curve, auc
 from sklearn.metrics import roc_curve
 import seaborn as sbn
 import numpy as np
+import tensorflow as tf
 
 RANDOM_STATE = 42
 
@@ -243,12 +244,13 @@ def compare_pr_curves(curves, title="Precision-Recall Curves"):
 
 def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
     # Check if the model supports predict_proba
-    if not hasattr(classifier, "predict_proba"):
-        print("This model does not support predict_proba().")
+    if isinstance(classifier, tf.keras.Model):
+        y_prob = classifier.predict(input_data).ravel()
+    elif hasattr(classifier, "predict_proba"):  # For scikit-learn models
+        y_prob = classifier.predict_proba(input_data)[:, 1]
+    else:
+        print("This model does not support probability predictions.")
         return None
-
-    # Get the probabilities of the positive classes
-    y_prob = classifier.predict_proba(input_data)[:, 1]
     
     precision, recall, _ = precision_recall_curve(predicted_labels, y_prob)
     auc_pr = auc(recall, precision)  # AUC of the precision-recall curve
@@ -304,3 +306,13 @@ def plot_distribution_and_normal(column, name):
 def build_model_with_params(model, params):
     model.set_params(**params)
     return model
+
+def plot_confusion_matrix_NN(prior_labels, predicted_labels, class_names):
+    cm = confusion_matrix(prior_labels, predicted_labels)
+    
+    # Crea il display della matrice di confusione
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    disp.plot(cmap=plt.cm.Blues)
+    plt.title("Confusion Matrix", fontweight='bold')
+    plt.show()
+    return
