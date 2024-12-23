@@ -10,6 +10,8 @@ from sklearn.metrics import precision_recall_curve, auc
 from sklearn.metrics import roc_curve
 import seaborn as sbn
 import numpy as np
+import tensorflow as tf
+from sklearn.metrics import f1_score
 
 RANDOM_STATE = 42
 
@@ -243,12 +245,13 @@ def compare_pr_curves(curves, title="Precision-Recall Curves"):
 
 def plot_PR_ROC_AUC(classifier, input_data, predicted_labels):
     # Check if the model supports predict_proba
-    if not hasattr(classifier, "predict_proba"):
-        print("This model does not support predict_proba().")
+    if isinstance(classifier, tf.keras.Model):
+        y_prob = classifier.predict(input_data).ravel()
+    elif hasattr(classifier, "predict_proba"):  # For scikit-learn models
+        y_prob = classifier.predict_proba(input_data)[:, 1]
+    else:
+        print("This model does not support probability predictions.")
         return None
-
-    # Get the probabilities of the positive classes
-    y_prob = classifier.predict_proba(input_data)[:, 1]
     
     precision, recall, _ = precision_recall_curve(predicted_labels, y_prob)
     auc_pr = auc(recall, precision)  # AUC of the precision-recall curve
@@ -304,3 +307,42 @@ def plot_distribution_and_normal(column, name):
 def build_model_with_params(model, params):
     model.set_params(**params)
     return model
+
+def plot_confusion_matrix_NN(prior_labels, predicted_labels, class_names):
+    cm = confusion_matrix(prior_labels, predicted_labels)
+    
+    # Crea il display della matrice di confusione
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    disp.plot(cmap=plt.cm.Blues)
+    plt.title("Confusion Matrix", fontweight='bold')
+    plt.show()
+    return
+
+
+# input:
+#     models -> list of model objects
+#     predictions -> list of predicted labels
+#     true_labels -> the true labels extracted from the test (or validation) set
+# output:
+#     returns the best model object based on this metric
+#
+# The comparison is based on the F1-Score Macro AVG metric
+# The code also displays the comparison results
+def compare_f1_score(models:list, predictions:list, true_labels):
+    macro_f1_scores = []
+   
+    for y_pred in predictions:
+        score = f1_score(true_labels, y_pred, average='macro')
+        macro_f1_scores.append(score)
+        
+
+    model_names = [model.name if hasattr(model, 'name') else f"Model {i+1}" for i, model in enumerate(models)]
+
+    results = pd.DataFrame({'Model': model_names, 'Macro F1-Score': macro_f1_scores, 'Model Object': models})
+
+   
+    results = results.sort_values(by='Macro F1-Score', ascending=False)
+    display(results[['Model', 'Macro F1-Score']])
+   
+    best_model = results.iloc[0]['Model Object']  
+    return best_model
