@@ -12,6 +12,10 @@ import seaborn as sbn
 import numpy as np
 import tensorflow as tf
 from sklearn.metrics import f1_score
+import json
+import os
+import json
+
 
 RANDOM_STATE = 42
 
@@ -346,3 +350,112 @@ def compare_f1_score(models:list, predictions:list, true_labels):
    
     best_model = results.iloc[0]['Model Object']  
     return best_model
+
+
+def save_classification_res(method_name, params, test_pred_labels, probability_class_res):
+    fpr, tpr, roc_auc, precision, recall, auc_pr = probability_class_res
+
+    # Prepara i dati da salvare
+    results = {
+        "method_name": method_name,
+        "params": params,
+        "predicted_labels": list(map(bool, test_pred_labels)),
+        "roc_curve": {
+            "fpr": fpr.tolist(),  # Falsi positivi
+            "tpr": tpr.tolist(),  # Veri positivi
+            "roc_auc": float(roc_auc)   # Area sotto la curva ROC
+        },
+        "pr_curve": {
+            "precision": precision.tolist(),  # Precisione
+            "recall": recall.tolist(),        # Richiamo
+            "auc_pr": float(auc_pr)                # Area sotto la curva Precision-Recall
+        }
+    }
+    # Nome del file JSON
+    filename = f"classification_results/{method_name}_res.json"
+
+    # Salva i risultati in formato JSON
+    with open(filename, 'w') as f:
+        json.dump(results, f, indent=4)  # indent=4 per renderlo leggibile
+
+    print(f"Risultati salvati in '{filename}'")
+
+
+
+def load_classification_res(method_name):
+
+    filename = f"../classification_results/{method_name}_res.json"
+
+    if not os.path.exists(filename):
+        raise FileNotFoundError(f"Il file '{filename}' non esiste.")
+
+    with open(filename, 'r') as f:
+        results = json.load(f)
+
+    method_name = results["method_name"]
+    params = results["params"]
+    predicted_labels = list(map(bool, results["predicted_labels"]))
+    roc_curve = results["roc_curve"]
+    pr_curve = results["pr_curve"]
+
+    fpr = roc_curve["fpr"]
+    tpr = roc_curve["tpr"]
+    roc_auc = roc_curve["roc_auc"]
+    precision = pr_curve["precision"]
+    recall = pr_curve["recall"]
+    auc_pr = pr_curve["auc_pr"]
+
+    probability_class_res = (fpr, tpr, roc_auc, precision, recall, auc_pr)
+
+    return method_name, params, predicted_labels, probability_class_res
+
+
+def train_test_for_non_distance_comp():
+    dataset = data_for_non_distance_method_comp()
+    test_set=dataset[dataset['race_year']>=2022]
+    train_set=dataset[dataset['race_year']<2022]
+    train_label=train_set.pop('top20')
+    test_label=test_set.pop('top20')
+    return train_set, test_set, train_label, test_label
+
+
+def data_for_non_distance_method_comp():
+    dataset = data_pre_processing_comp()
+    categorical_columns = ['geo area']
+
+    dataset = categorical_columns_encoding(dataset, categorical_columns)
+
+    dataset.drop(categorical_columns, axis=1, inplace=True) #column already encoded
+    return dataset
+
+def data_pre_processing_comp():
+    dataset, cyclists, placements = merge_all_dataset_comp()
+
+    new_stats = create_cyclist_stats_2021(cyclists, placements)
+
+    dataset = drop_previous_and_merge_newstats(dataset, new_stats)
+
+    dataset = impute_null_stats_2021(dataset)
+
+    dataset.drop(['delta', 'median_delta', 'std_delta'], axis=1, inplace=True)
+    drop_redundant_columns(dataset)
+
+    dataset['top20'] = (dataset['position'] < 20).astype(int)
+    dataset.drop(['position'], axis=1, inplace=True)
+
+    return dataset
+
+def merge_all_dataset_comp():
+    races = pd.read_csv('../../dataset/preprocessedRaces_without_outliers.csv', sep=",")
+    placements = pd.read_csv('../../dataset/preprocessedPlacements.csv', sep=",")
+    cyclists = pd.read_csv('../../dataset/preprocessedCyclists_without_outliers.csv', sep=",")
+    cyclists.drop(['AVG weighted position', 'AVG position Autumn', 'AVG position Spring', 'AVG position Summer',
+                   'AVG position Winter', 'AVG position Q1', 'AVG position Q2', 'AVG position Q3', 'AVG position Q4'],
+                  axis=1, inplace=True)
+    races.drop(['uci_points', 'average_temperature', 'is_tarmac', 'is_cobbled', 'is_gravel'], axis=1, inplace=True)
+    placements.drop(['cyclist_team'], axis=1, inplace=True)
+    dataset = pd.merge(placements, races, how='inner', on='_url')
+    dataset.drop(['date_y', 'date_x'], axis=1, inplace=True)
+    dataset = pd.merge(dataset, cyclists, how='inner', left_on='cyclist', right_on='name')
+    dataset.drop(['name_x', 'name_y'], axis=1, inplace=True)
+    return dataset, cyclists, placements
