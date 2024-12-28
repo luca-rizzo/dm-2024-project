@@ -5,5 +5,8 @@ numpy==1.26.4
 scikit-learn==1.5.2
 scipy==1.14.1
 imblearn==0.0
-wittgenstein
-tensorflow
+wittgenstein==0.3.4
+tensorflow==2.18.0
+lime==0.2.0.1
+interpret==0.6.8
+XAI-Library==0.0.4
