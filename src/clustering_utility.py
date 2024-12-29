@@ -72,4 +72,53 @@ def compute_similarity_matrix(standardized_df, cluster_labels, m="euclidean"):
     plt.close()
 
 
-    
+# it requires a dataframe which is already standardized
+def show_sorted_similarity_matrix(standardized_df, cluster_labels, m="euclidean"):
+    # Discard noisy points
+    valid_indices = np.where(cluster_labels != -1)[0]
+    filtered_df = standardized_df.iloc[valid_indices]  # Dataset filtering
+    filtered_labels = cluster_labels[valid_indices]  # Label filtering
+    # Determine the pairwise distance matrix (using the Euclidean distance)
+    pairwise_distances_ = pairwise_distances(filtered_df, metric=m)
+    # Cluster labels
+    n = len(filtered_labels)
+    # Sorting by labels
+    sorted_pairwisedist = pairwise_distances_[np.argsort(filtered_labels)][:, np.argsort(filtered_labels)]
+    # Keeping the distance values between 0 and 1.
+    sorted_pairwisedist = sorted_pairwisedist / np.max(sorted_pairwisedist)
+    sorted_similarity = 1 - sorted_pairwisedist / np.max(sorted_pairwisedist)
+    plt.title("Sorted proximity matrix", fontweight='bold')
+    plt.xlabel("Points ordered by cluster")
+    plt.ylabel("Points ordered by cluster")
+    plt.imshow(sorted_similarity, cmap='jet')
+    plt.colorbar()
+    plt.show()
+    plt.close()
+
+
+# it requires a dataframe which is already standardized
+def show_correlation_with_ideal_matrix(standardized_df, cluster_labels, m="euclidean"):
+    # Discard noisy points
+    valid_indices = np.where(cluster_labels != -1)[0]
+    filtered_df = standardized_df.iloc[valid_indices]  # Filter dataset
+    filtered_labels = cluster_labels[valid_indices]  # Filter labels
+
+    # Compute pairwise distance and similarity matrix
+    pairwise_distances_ = pairwise_distances(filtered_df, metric=m)
+    similarity_matrix = 1 - pairwise_distances_ / np.max(pairwise_distances_)
+
+    # Create the ideal similarity matrix
+    n = len(filtered_labels)
+    ideal_similarity_matrix = np.zeros((n, n), dtype=int)
+
+    for i in range(n):
+        for j in range(n):
+            if filtered_labels[i] == filtered_labels[j]:
+                ideal_similarity_matrix[i, j] = 1
+
+    # Compute Pearson correlation
+    proximity_vector = similarity_matrix.ravel()
+    ideal_similarity_vector = ideal_similarity_matrix.ravel()
+    correlation, _ = pearsonr(proximity_vector, ideal_similarity_vector)
+
+    print(f"Pearson correlation between similarity matrix and ideal matrix: {correlation:.4f}")
