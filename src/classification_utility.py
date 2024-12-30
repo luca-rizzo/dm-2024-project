@@ -459,3 +459,59 @@ def merge_all_dataset_comp():
     dataset = pd.merge(dataset, cyclists, how='inner', left_on='cyclist', right_on='name')
     dataset.drop(['name_x', 'name_y'], axis=1, inplace=True)
     return dataset, cyclists, placements
+
+
+def get_f1_manual_model_validation(train_set, train_labels, model):
+    train_set_splitted, validation_set, train_labels_splitted, validation_label = split_in_train_and_validation(train_set, train_labels)
+    model.fit(train_set_splitted, train_labels_splitted)
+    valid_pred = model.predict(validation_set)
+    return metrics.f1_score(validation_label, valid_pred, average='macro')
+
+def report_on_manual_model_validation(train_set, train_labels, model):
+    train_set_splitted, validation_set, train_labels_splitted, validation_label = split_in_train_and_validation(train_set, train_labels)
+    model.fit(train_set_splitted, train_labels_splitted)
+    valid_pred = model.predict(validation_set)
+    print(classification_report(validation_label, valid_pred, target_names=['out_top_20', 'top20']))
+
+def compute_random_grid_search(estimator, param_grid, train_set_us, train_labels_us):
+    grid_search = RandomizedSearchCV(
+        estimator=estimator,
+        param_distributions=param_grid,
+        cv=3,
+        refit='f1_macro',
+        scoring=['accuracy', 'f1_macro', 'precision_macro', 'recall_macro'],
+        verbose=True,
+        n_jobs=5
+    )
+    grid_search.fit(train_set_us, train_labels_us)
+    cv_results = grid_search.cv_results_
+
+    results_df = pd.DataFrame({
+        'params': cv_results['params'],
+        'mean_accuracy': cv_results['mean_test_accuracy'],
+        'mean_f1': cv_results['mean_test_f1_macro'],
+        'mean_precision_macro': cv_results['mean_test_precision_macro'],
+        'mean_recall_macro': cv_results['mean_test_recall_macro'],
+    })
+    return results_df, grid_search.best_params_, grid_search.best_score_, grid_search
+
+def compute_grid_search(estimator, param_grid, train_set_us, train_labels_us):
+    grid_search = GridSearchCV(
+        estimator=estimator,
+        param_grid=param_grid,
+        cv=3,
+        refit='f1_macro',
+        scoring=['accuracy', 'f1_macro', 'precision_macro', 'recall_macro'],
+        verbose=True,
+        n_jobs=5
+    )
+    grid_search.fit(train_set_us, train_labels_us)
+    cv_results = grid_search.cv_results_
+    results_df = pd.DataFrame({
+        'params': cv_results['params'],
+        'mean_accuracy': cv_results['mean_test_accuracy'],
+        'mean_f1_macro': cv_results['mean_test_f1_macro'],
+        'mean_precision_macro': cv_results['mean_test_precision_macro'],
+        'mean_recall_macro': cv_results['mean_test_recall_macro'],
+    })
+    return results_df, grid_search.best_params_, grid_search.best_score_, grid_search
