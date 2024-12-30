@@ -73,9 +73,9 @@ def drop_previous_and_merge_newstats(dataset, new_stats):
 
 
 def merge_all_dataset():
-    races = pd.read_csv('../dataset/preprocessedRaces_without_outliers.csv', sep=",")
-    placements = pd.read_csv('../dataset/preprocessedPlacements.csv', sep=",")
-    cyclists = pd.read_csv('../dataset/preprocessedCyclists_without_outliers.csv', sep=",")
+    races = pd.read_csv('../../dataset/preprocessedRaces_without_outliers.csv', sep=",")
+    placements = pd.read_csv('../../dataset/preprocessedPlacements.csv', sep=",")
+    cyclists = pd.read_csv('../../dataset/preprocessedCyclists_without_outliers.csv', sep=",")
     cyclists.drop(['AVG weighted position', 'AVG position Autumn', 'AVG position Spring', 'AVG position Summer',
                    'AVG position Winter', 'AVG position Q1', 'AVG position Q2', 'AVG position Q3', 'AVG position Q4'],
                   axis=1, inplace=True)
