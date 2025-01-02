@@ -201,21 +201,21 @@ def plot_confusion_matrix(classifier, prior_labels, predicted_labels):
     plt.close()
     return
 
-def compare_roc_curves(curves, title="ROC Curves"):
+def compare_roc_curves(curves, title="ROC Curves", figsize=(10, 8)):
     # Determine the curve with the maximum AUC for the ROC curve
     # manages tuples in the form ((fpr, tpr, auc_roc, pr, rec, auc_pr), label)
     best_curve = max(curves, key=lambda x: x[0][2]) 
     best_auc = best_curve[0][2] # x[0][5] is the AUC for the ROC
    
-    # Plot all curves, highlighting the best one
     plt.figure(0).clf()
+    # Plot all curves, highlighting the best one
+    plt.figure(figsize=figsize)  # Set figure size
     for curve in curves:
         fpr, tpr, auc_plot, label = curve[0][0], curve[0][1], curve[0][2], curve[1]
         if auc_plot == best_auc:
             plt.plot(fpr, tpr, label=f"{label}, roc_auc={auc_plot:.4f}", linewidth=2.5, color='red')  # Highlight the "best" one
         else:
             plt.plot(fpr, tpr, label=f"{label}, roc_auc={auc_plot:.4f}")
-
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title(title, fontweight='bold')
@@ -224,7 +224,7 @@ def compare_roc_curves(curves, title="ROC Curves"):
     plt.close()
     return
 
-def compare_pr_curves(curves, title="Precision-Recall Curves"):
+def compare_pr_curves(curves, title="Precision-Recall Curves", figsize=(10, 8)):
     # Determine the curve with the maximum AUC for Precision-Recall curve (index 5 for auc_pr)
     # manages tuples in the form ((fpr, tpr, auc_roc, pr, rec, auc_pr), label)
     best_curve = max(curves, key=lambda x: x[0][5])  # x[0][5] is the AUC for PR (precision-recall)
@@ -232,6 +232,8 @@ def compare_pr_curves(curves, title="Precision-Recall Curves"):
     
     # Plot all curves, highlighting the best one
     plt.figure(0).clf() 
+    plt.figure(figsize=figsize)  # Set figure size
+
     for curve in curves:
         precision, recall, auc_pr, label = curve[0][3], curve[0][4], curve[0][5], curve[1]
         if auc_pr == best_auc_pr:
