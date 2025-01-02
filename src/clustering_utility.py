@@ -4,13 +4,17 @@ import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 from scipy.stats import pearsonr
 
-def clusters_conditional_box_plot(df, cluster_label):
+import matplotlib.pyplot as plt
+import seaborn as sbn
+
+def clusters_conditional_box_plot(df, cluster_label, n_columns=2):
     columns = [col for col in df.columns if col != cluster_label]
-    n_rows = (len(columns) + 2 - 1) // 2  
+    
+    n_rows = (len(columns) + n_columns - 1) // n_columns  
 
-    fig, axes = plt.subplots(n_rows, 2, figsize=(14, 5 * n_rows), sharey=False)
+    # Crea il grafico
+    fig, axes = plt.subplots(n_rows, n_columns, figsize=(14, 5 * n_rows), sharey=False)
 
-    # Rendi axes un array 1D per un accesso più semplice
     axes = axes.flatten()
 
     for i, column in enumerate(columns):
@@ -19,7 +23,6 @@ def clusters_conditional_box_plot(df, cluster_label):
         axes[i].set_xlabel("Cluster")
         axes[i].set_ylabel(column)
 
-    # Nascondi subplot extra (se presenti)
     for j in range(len(columns), len(axes)):
         axes[j].set_visible(False)
 
