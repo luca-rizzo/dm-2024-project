@@ -1,9 +1,10 @@
 import pandas as pd
 from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, train_test_split
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import RandomUnderSampler
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_recall_curve, auc
