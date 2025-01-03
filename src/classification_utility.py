@@ -387,7 +387,7 @@ def save_classification_res(method_name, params, test_pred_labels, probability_c
 
 def load_classification_res(method_name):
 
-    filename = f"../classification_results/{method_name}_res.json"
+    filename = f"classification_results/{method_name}_res.json"
 
     if not os.path.exists(filename):
         raise FileNotFoundError(f"Il file '{filename}' non esiste.")
