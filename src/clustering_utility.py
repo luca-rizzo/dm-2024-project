@@ -12,7 +12,6 @@ def clusters_conditional_box_plot(df, cluster_label, n_columns=2):
     
     n_rows = (len(columns) + n_columns - 1) // n_columns  
 
-    # Crea il grafico
     fig, axes = plt.subplots(n_rows, n_columns, figsize=(14, 5 * n_rows), sharey=False)
 
     axes = axes.flatten()

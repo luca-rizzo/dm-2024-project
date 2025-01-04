@@ -47,7 +47,7 @@ def data_pre_processing():
 
 def impute_null_stats_2021(dataset):
     to_work = dataset.copy()
-    # Colonne su cui riempire i valori NaN
+    # Columns to fill Nan values
     columns_to_fill = ['median position_2021', 'AVG position_2021', '# cyclist races_2021', 'std_dev position_2021']
     for col in columns_to_fill:
         to_work[col] = to_work[col].fillna(to_work[col].mean())
@@ -318,7 +318,7 @@ def build_model_with_params(model, params):
 def plot_confusion_matrix_NN(prior_labels, predicted_labels, class_names):
     cm = confusion_matrix(prior_labels, predicted_labels)
     
-    # Crea il display della matrice di confusione
+    # Create the confusion matrix display
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
     disp.plot(cmap=plt.cm.Blues)
     plt.title("Confusion Matrix", fontweight='bold')
@@ -358,28 +358,28 @@ def compare_f1_score(models:list, predictions:list, true_labels):
 def save_classification_res(method_name, params, test_pred_labels, probability_class_res):
     fpr, tpr, roc_auc, precision, recall, auc_pr = probability_class_res
 
-    # Prepara i dati da salvare
+    # Prepare data to save
     results = {
         "method_name": method_name,
         "params": params,
         "predicted_labels": list(map(bool, test_pred_labels)),
         "roc_curve": {
-            "fpr": fpr.tolist(),  # Falsi positivi
-            "tpr": tpr.tolist(),  # Veri positivi
-            "roc_auc": float(roc_auc)   # Area sotto la curva ROC
+            "fpr": fpr.tolist(),  # False positive
+            "tpr": tpr.tolist(),  # True positive
+            "roc_auc": float(roc_auc)   # Area under the ROC curve
         },
         "pr_curve": {
-            "precision": precision.tolist(),  # Precisione
-            "recall": recall.tolist(),        # Richiamo
-            "auc_pr": float(auc_pr)                # Area sotto la curva Precision-Recall
+            "precision": precision.tolist(),  # Precision
+            "recall": recall.tolist(),        # Recall
+            "auc_pr": float(auc_pr)           # Area under the curve Precision-Recall
         }
     }
-    # Nome del file JSON
+    
     filename = f"classification_results/{method_name}_res.json"
 
-    # Salva i risultati in formato JSON
+    # Save results in JSON format
     with open(filename, 'w') as f:
-        json.dump(results, f, indent=4)  # indent=4 per renderlo leggibile
+        json.dump(results, f, indent=4)
 
     print(f"Risultati salvati in '{filename}'")
 
